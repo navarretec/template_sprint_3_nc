@@ -21,10 +21,10 @@ def activate():
         if g.user:
             return redirect(url_for('inbox.show'))
         
-        if request.method == ?: 
+        if request.method == 'POST': 
             number = request.args['auth'] 
             
-            db = ?
+            db = get_db() if not g.db else g.dbc
             attempt = db.execute(
                 QUERY, (number, utils.U_UNCONFIRMED)
             ).fetchone()
@@ -44,21 +44,21 @@ def activate():
         return redirect(url_for('auth.login'))
 
 
-@bp.route('/register', methods=?)
+@bp.route('/register', methods=('GET','POST'))
 def register():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
       
-        if request.method == ?:    
-            username = ?
-            password = ?
-            email = ?
+        if request.method == 'POST':    
+            username = request.form['username']
+            password = ['password']
+            email = ['email']
             
-            db = ?
+            db = get_db() if not g.db else g.dbc
             error = None
 
-            if ?:
+            if not username:
                 error = 'Username is required.'
                 flash(error)
                 return render_template(TEMP)
@@ -68,7 +68,7 @@ def register():
                 flash(error)
                 return render_template(TEMP)
 
-            if ?:
+            if not password:
                 error = 'Password is required.'
                 flash(error)
                 return render_template('auth/register.html')
@@ -78,7 +78,7 @@ def register():
                 flash(error)
                 return render_template(TEMP)
             
-            if (? or (not utils.isEmailValid(email))):
+            if (not email or (not utils.isEmailValid(email))):
                 error =  'Email address invalid.'
                 flash(error)
                 return render_template('auth/register.html')
@@ -119,22 +119,22 @@ def register():
         return render_template('auth/register.html')
 
     
-@bp.route('/confirm', methods=?)
+@bp.route('/confirm', methods=('GET','POST'))
 def confirm():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?: 
-            password = ? 
-            password1 = ?
+        if request.method == 'POST': 
+            password = request.form['password']
+            password1 = request.form['password1']
             authid = request.form['authid']
 
             if not authid:
                 flash('Invalid')
                 return render_template('auth/forgot.html')
 
-            if ?:
+            if not password:
                 flash('Password required')
                 return render_template('auth/change.html', number=authid)
 
@@ -142,7 +142,7 @@ def confirm():
                 flash('Password confirmation required')
                 return render_template(TEMP, number=authid)
 
-            if ? != password:
+            if password1 != password:
                 flash('Both values should be the same')
                 return render_template(TEMP, number=authid)
 
@@ -151,7 +151,7 @@ def confirm():
                 flash(error)
                 return render_template('auth/change.html', number=authid)
 
-            db = ?
+            db = get_db() if not g.db else g.dbc
             attempt = db.execute(
                 QUERY, (authid, utils.F_ACTIVE)
             ).fetchone()
@@ -182,10 +182,10 @@ def change():
         if g.user:
             return redirect(url_for('inbox.show'))
         
-        if request.method == ?: 
+        if request.method == 'POST': 
             number = request.args['auth'] 
             
-            db = ?
+            db = get_db() if not g.db else g.dbc
             attempt = db.execute(
                 QUERY, (number, utils.F_ACTIVE)
             ).fetchone()
@@ -205,9 +205,9 @@ def forgot():
             return redirect(url_for('inbox.show'))
         
         if request.method == 'POST':
-            email = ?
+            email = request.form['email']
             
-            if (? or (not utils.isEmailValid(email))):
+            if (email or (not utils.isEmailValid(email))):
                 error = 'Email Address Invalid'
                 flash(error)
                 return render_template('auth/forgot.html')
@@ -248,40 +248,40 @@ def forgot():
         return render_template(TEMP)
 
 
-@bp.route('/login', methods=?)
+@bp.route('/login', methods=('GET','POST'))
 def login():
     try:
         if g.user:
             return redirect(url_for('inbox.show'))
 
-        if request.method == ?:
-            username = ?
-            password = ?
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
 
-            if ?:
+            if not username:
                 error = 'Username Field Required'
                 flash(error)
                 return render_template('auth/login.html')
 
-            if ?:
+            if not password:
                 error = 'Password Field Required'
                 flash(error)
                 return render_template(TEMP)
 
-            db = ?
+            db = get_db() if not g.db else g.dbc
             error = None
             user = db.execute(
                 'SELECT * FROM user WHERE username = ?', (username,)
             ).fetchone()
             
-            if ?:
+            if user is None:
                 error = 'Incorrect username or password'
             elif not check_password_hash(user['password'], password + user['salt']):
                 error = 'Incorrect username or password'   
 
             if error is None:
                 session.clear()
-                session['user_id'] = user[?]
+                session['user_id'] = user['id']
                 return redirect(url_for('inbox.show'))
 
             flash(error)
@@ -293,7 +293,7 @@ def login():
 
 @bp.before_app_request
 def load_logged_in_user():
-    user_id = session.get(?)
+    user_id = session.get('use_id')
 
     if user_id is None:
         g.user = None
@@ -305,7 +305,7 @@ def load_logged_in_user():
         
 @bp.route('/logout')
 def logout():
-    session.?
+    session.clear()
     return redirect(url_for('auth.login'))
 
 
@@ -332,3 +332,6 @@ def send_email(credentials, receiver, subject, message):
     smtp.login(credentials['user'], credentials['password'])
     smtp.sendmail(credentials['user'], receiver, email.as_string())
     smtp.quit()
+
+    # Linea para iniciar el proyecto
+    #auth.run(host='localhost', port=5000, debug=True)

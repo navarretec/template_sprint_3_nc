@@ -16,7 +16,7 @@ def getDB():
 @bp.route('/show')
 @login_required
 def show():
-    db = ?
+    db = get_db()
     messages = db.execute(
         QUERY
     ).fetchall()
@@ -29,21 +29,21 @@ def show():
 def send():
     if request.method == 'POST':        
         from_id = g.user['id']
-        to_username = ?
-        subject = ?
-        body = ?
+        to_username = request.form['to_username']
+        subject = request.form['subject']
+        body = request.form['body']
 
-        db = ?
+        db = get_db()
        
         if not to_username:
             flash('To field is required')
             return render_template(TEMP)
         
-        if ?:
+        if not subject:
             flash('Subject field is required')
             return render_template('inbox/send.html')
         
-        if ?:
+        if not body:
             flash('Body field is required')
             return render_template(TEMP)    
         
@@ -60,7 +60,7 @@ def send():
         if error is not None:
             flash(error)
         else:
-            db = ?
+            db = get_db()
             db.execute(
                 QUERY,
                 (g.user['id'], userto['id'], subject, body)
