@@ -52,8 +52,8 @@ def register():
       
         if request.method == 'POST':    
             username = request.form['username']
-            password = ['password']
-            email = ['email']
+            password = request.form['password']
+            email = request.form['email']
             
             db = get_db() if not g.db else g.dbc
             error = None
