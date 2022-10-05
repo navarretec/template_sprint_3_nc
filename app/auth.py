@@ -43,7 +43,6 @@ def activate():
         print(e)
         return redirect(url_for('auth.login'))
 
-
 @bp.route('/register', methods=('GET','POST'))
 def register():
     try:
