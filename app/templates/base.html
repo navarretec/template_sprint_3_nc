@@ -13,7 +13,7 @@
           <li><span>{{ g.user['username'] }}</span>
           <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
         {% else %}
-          <li><a href="{{ url_for('auth.register') }}">Registrarse</a>
+          <li><a href="{{ url_for('auth.register') }}">Registro</a>
           <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
           <li><a href="{{ url_for('auth.forgot') }}">¿Olvidó su contraseña?</a>
         {% endif %}
