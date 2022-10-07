@@ -43,6 +43,7 @@ def activate():
         print(e)
         return redirect(url_for('auth.login'))
 
+
 @bp.route('/register', methods=('GET','POST'))
 def register():
     try:
@@ -58,37 +59,37 @@ def register():
             error = None
 
             if not username:
-                error = 'Username is required.'
+                error = 'El campo Usuario es requerido.'
                 flash(error)
                 return render_template('auth/register.html')
             
             if not utils.isUsernameValid(username):
-                error = "Username should be alphanumeric plus '.','_','-'"
+                error = "El campo Usuario debe ser alfanumérico más '.','_','-'"
                 flash(error)
                 return render_template('auth/register.html')
 
             if not password:
-                error = 'Password is required.'
+                error = 'El campo Contraseña es requerido.'
                 flash(error)
                 return render_template('auth/register.html')
 
             if db.execute(QUERY, (username,)).fetchone() is not None:
-                error = 'User {} is already registered.'.format(username)
+                error = 'El usuario {} ya está registrado.'.format(username)
                 flash(error)
                 return render_template('auth/register.html')
             
             if (not email or (not utils.isEmailValid(email))):
-                error =  'Email address invalid.'
+                error =  'Dirección de correo inválida.'
                 flash(error)
                 return render_template('auth/register.html')
             
             if db.execute('SELECT id FROM user WHERE email = ?', (email,)).fetchone() is not None:
-                error =  'Email {} is already registered.'.format(email)
+                error =  'El correo {} ya está registrado.'.format(email)
                 flash(error)
                 return render_template(TEMP)
             
             if (not utils.isPasswordValid(password)):
-                error = 'Password should contain at least a lowercase letter, an uppercase letter and a number with 8 characters long'
+                error = 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y ser de 8 caracteres de longitud.'
                 flash(error)
                 return render_template('auth/register.html')
 
@@ -106,11 +107,11 @@ def register():
                 'Select user,password from credentials where name=?', (utils.EMAIL_APP,)
             ).fetchone()
 
-            content = 'Hello there, to activate your account, please click on this link ' + flask.url_for('auth.activate', _external=True) + '?auth=' + number
+            content = 'Hola, para activar su cuenta, por favor vaya a este enlace ' + flask.url_for('auth.activate', _external=True) + '?auth=' + number
             
-            send_email(credentials, receiver=email, subject='Activate your account', message=content)
+            send_email(credentials, receiver=email, subject='Active su cuenta', message=content)
             
-            flash('Please check in your registered email to activate your account')
+            flash('Por favor, revise su correo registrado para activar su cuenta')
             return render_template('auth/login.html') 
 
         return render_template(TEMP) 
@@ -130,23 +131,23 @@ def confirm():
             authid = request.form['authid']
 
             if not authid:
-                flash('Invalid')
+                flash('Inválido')
                 return render_template('auth/forgot.html')
 
             if not password:
-                flash('Password required')
+                flash('Contraseña requerida')
                 return render_template('auth/change.html', number=authid)
 
             if not password1:
-                flash('Password confirmation required')
+                flash('Confirmación de contraseña requerida')
                 return render_template(TEMP, number=authid)
 
             if password1 != password:
-                flash('Both values should be the same')
+                flash('Los dos valores deben ser iguales')
                 return render_template(TEMP, number=authid)
 
             if not utils.isPasswordValid(password):
-                error = 'Password should contain at least a lowercase letter, an uppercase letter and a number with 8 characters long.'
+                error = 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y ser de 8 caracteres de longitud.'
                 flash(error)
                 return render_template('auth/change.html', number=authid)
 
@@ -167,7 +168,7 @@ def confirm():
                 db.commit()
                 return redirect(url_for('auth.login'))
             else:
-                flash('Invalid')
+                flash('Inválido')
                 return render_template('auth/forgot.html')
 
         return render_template(TEMP)
@@ -207,7 +208,7 @@ def forgot():
             email = request.form['email']
             
             if (email or (not utils.isEmailValid(email))):
-                error = 'Email Address Invalid'
+                error = 'Dirección de correo inválida'
                 flash(error)
                 return render_template('auth/forgot.html')
 
@@ -233,13 +234,13 @@ def forgot():
                     'Select user,password from credentials where name=?',(utils.EMAIL_APP,)
                 ).fetchone()
                 
-                content = 'Hello there, to change your password, please click on this link ' + flask.url_for('auth.change', _external=True) + '?auth=' + number
+                content = 'Hola, para cambiar su contraseña, por favor siga este enlace ' + flask.url_for('auth.change', _external=True) + '?auth=' + number
                 
                 send_email(credentials, receiver=email, subject='New Password', message=content)
                 
-                flash('Please check in your registered email')
+                flash('Por favor, revise su correo registrado')
             else:
-                error = 'Email is not registered'
+                error = 'El correo no está registrado'
                 flash(error)            
 
         return render_template('auth/forgot.html')
@@ -258,12 +259,12 @@ def login():
             password = request.POST.get('password')
 
             if not username:
-                error = 'Username Field Required'
+                error = 'El campo Usuario es requerido'
                 flash(error)
                 return render_template('auth/login.html')
 
             if not password:
-                error = 'Password Field Required'
+                error = 'El campo Contraseña es requerido'
                 flash(error)
                 return render_template(TEMP)
 
@@ -274,9 +275,9 @@ def login():
             ).fetchone()
             
             if user is None:
-                error = 'Incorrect username or password'
+                error = 'Usuario o contraseña incorrecta'
             elif not check_password_hash(user['password'], password + user['salt']):
-                error = 'Incorrect username or password'   
+                error = 'Usuario o contraseña incorrecta'   
 
             if error is None:
                 session.clear()

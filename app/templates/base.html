@@ -1,21 +1,21 @@
 <!doctype html>
 <html class="bg-slate-900">
   <head>
-    <title>{% block title %}{% endblock %} - Myapp</title>
+    <title>{% block title %}{% endblock %} - Mi app</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
   </head>
   <body class="max-w-lg mx-auto rounded-md">
     <nav class="rounded-t-md prose">
-      <h1 class="m-0 ml-1">Demo</h1>
+      <h1 class="m-0 ml-1">Mensajería</h1>
       <ul class="m-0">
         {% if g.user %}
           <li><span>{{ g.user['username'] }}</span>
-          <li><a href="{{ url_for('auth.logout') }}">Logout</a>
+          <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
         {% else %}
-          <li><a href="{{ url_for('auth.register') }}">Register</a>
-          <li><a href="{{ url_for('auth.login') }}">Login</a>
-          <li><a href="{{ url_for('auth.forgot') }}">Forgot your password?</a>
+          <li><a href="{{ url_for('auth.register') }}">Registrarse</a>
+          <li><a href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+          <li><a href="{{ url_for('auth.forgot') }}">¿Olvidó su contraseña?</a>
         {% endif %}
       </ul>
     </nav>

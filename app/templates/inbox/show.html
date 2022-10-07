@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h2 class="text-slate-700 my-2">{% block title %}Messages{% endblock %}</h2>
+  <h2 class="text-slate-700 my-2">{% block title %}Mensajes{% endblock %}</h2>
   {% if g.user %}
     <div class="flex justify-end">
-      <a class="action" href="{{ url_for('inbox.send') }}">New</a>
+      <a class="action" href="{{ url_for('inbox.send') }}">Nuevo</a>
       <a class="action" href="{{ url_for('inbox.getDB') }}">get DB</a>
     </div>
   {% endif %}
