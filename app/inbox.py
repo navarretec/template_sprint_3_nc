@@ -18,10 +18,10 @@ def getDB():
 def show():
     db = get_db()
     messages = db.execute(
-        QUERY
+        "SELECT message.subject, user.username, message.created, message.body FROM message JOIN user on message.from_id=user.id WHERE message.to_id="+str(g.user['id'])+" ORDER BY message.created desc"
     ).fetchall()
 
-    return render_template(TEMP, messages=messages)
+    return render_template('inbox/show.html', messages=messages)
 
 
 @bp.route('/send', methods=('GET', 'POST'))
@@ -29,15 +29,15 @@ def show():
 def send():
     if request.method == 'POST':        
         from_id = g.user['id']
-        to_username = request.form['to_username']
-        subject = request.form['subject']
-        body = request.form['body']
+        to_username = request.form["to"]
+        subject = request.form["subject"]
+        body = request.form["body"]
 
         db = get_db()
        
         if not to_username:
             flash('El campo Para es requerido')
-            return render_template(TEMP)
+            return render_template('inbox/send.html')
         
         if not subject:
             flash('El campo Asunto requerido')
@@ -45,13 +45,13 @@ def send():
         
         if not body:
             flash('El campo Cuerpo es requerido')
-            return render_template(TEMP)    
+            return render_template('inbox/send.html')    
         
         error = None    
         userto = None 
         
         userto = db.execute(
-            QUERY, (to_username,)
+            "SELECT * FROM user WHERE username=?", (to_username,)
         ).fetchone()
         
         if userto is None:
@@ -62,7 +62,7 @@ def send():
         else:
             db = get_db()
             db.execute(
-                QUERY,
+                "INSERT INTO message (from_id,to_id,subject,body) VALUES (?,?,?,?)",
                 (g.user['id'], userto['id'], subject, body)
             )
             db.commit()
